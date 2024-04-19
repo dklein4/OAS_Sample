@@ -1,0 +1,191 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "Meme Meister",
+    "description": "API to create memes"
+  },
+  "host": "api.mememeister.com",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application.json"
+  ],
+  "produces": [
+    "application.json"
+  ],
+  "paths": {
+    "/memes": {
+      "post": {
+        "description": "Creates a meme",
+        "parameters": [
+          {
+            "name": "image",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "The image to be used in the meme"
+          },
+          {
+            "name": "topCaption",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "The caption to be at the top of the meme. Must be URL-encoded (spaces must be written as %20, etc.)"
+          },
+          {
+            "name": "bottomCaption",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "The caption to be at the bottom of the meme. Must be URL-encoded (spaces must be written as %20, etc.)"
+          }
+        ],
+        "security": [
+          {
+            "oauthFacebook": [
+              "write:memes",
+              "read:memes"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "file"
+            }
+          }
+        },
+        "consumes": [
+          "image/jpeg",
+          "image/gif",
+          "image/png",
+          "multipart/form-data"
+        ],
+        "produces": [
+          "image/jpeg"
+        ]
+      },
+      "get": {
+        "description": "Returns a list of meme IDs and captions",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Term to search for. Must be URL-encoded (spaces must be written as %20, etc.)"
+          }
+        ],
+        "security": [
+          {
+            "oauthFacebook": [
+              "read:memes"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/memeInfo"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memes/{meme-id}": {
+      "get": {
+        "description": "Returns a specific meme using its ID",
+        "parameters": [
+          {
+            "name": "meme-id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "The meme ID"
+          }
+        ],
+        "security": [
+          {
+            "oauthFacebook": [
+              "read:memes"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "file"
+            }
+          }
+        },
+        "produces": [
+          "image/jpeg"
+        ]
+      },
+      "delete": {
+        "description": "Deletes a specific meme using its ID",
+        "parameters": [
+          {
+            "name": "meme-id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "The meme ID"
+          }
+        ],
+        "security": [
+          {
+            "oauthFacebook": [
+              "read:memes"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "memeInfo": {
+      "description": "Information about a meme",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID of meme"
+        },
+        "topCaption": {
+          "type": "string",
+          "description": "Text to be at the top of the meme"
+        },
+        "bottomCaption": {
+          "type": "string",
+          "description": "Text to be at the bottom of the meme"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauthFacebook": {
+      "type": "oauth2",
+      "authorizationUrl": "https://dev.facebook.com/oauth/authenticate",
+      "flow": "implicit",
+      "scopes": {
+        "write:memes": "Modify memes in your account",
+        "read:memes": "Read memes in your account"
+      },
+      "description": "Authentication is done by logging into Facebook account"
+    }
+  }
+}
